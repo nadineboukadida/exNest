@@ -3,19 +3,45 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
+import { UserDto } from './dto/user.dto';
+import { isInstance } from 'class-validator';
+import { UserUpdateDto } from './dto/user-update.dto';
 
 @Controller('premier')
 export class PremierController {
+  @Post('test')
+  testValidateur(@Body() user: UserDto): UserDto {
+    console.log(user);
+    console.log(isInstance(user, UserDto));
+    return user;
+  }
+  @Post('test2')
+  testValidateur2(@Body() user: UserDto): UserDto {
+    console.log(user);
+    console.log(isInstance(user, UserDto));
+    return user;
+  }
+
+  @Post('testu')
+  testValidateurUodate(@Body() user: UserUpdateDto): UserUpdateDto {
+    console.log(user);
+    console.log(isInstance(user, UserDto));
+    return user;
+  }
   @Get('/:name/:firstname')
   getPremierWithParam(@Param('name') params): string {
     console.log(params);
     console.log('GET 🐢');
+    throw new NotFoundException('');
     return 'GET 🐢';
   }
 
