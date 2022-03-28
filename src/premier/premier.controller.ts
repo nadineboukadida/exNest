@@ -15,9 +15,13 @@ import { Observable, of } from 'rxjs';
 import { UserDto } from './dto/user.dto';
 import { isInstance } from 'class-validator';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { ConfigService } from "@nestjs/config";
 
 @Controller('premier')
 export class PremierController {
+  constructor(private configService: ConfigService) {
+    console.log(this.configService.get('name'));
+  }
   @Post('test')
   testValidateur(@Body() user: UserDto): UserDto {
     console.log(user);
