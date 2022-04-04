@@ -4,7 +4,10 @@ import { Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { TodoService } from './todo.service';
 import { TodoEntity } from './Entity/todo.entity';
-@Controller('todo')
+@Controller({
+  path: 'todo',
+  version: '1',
+})
 export class TodoController {
   constructor(private todoService: TodoService) {
     this.todos = [new Todo('1', 'Sport', 'Faire du sport')];
@@ -16,7 +19,7 @@ export class TodoController {
     return this.todos;
   }
   @Post('fake')
-  addFakeTodo(@Body() newTodoData: Todo): Todo {
+  addTodo(@Body() newTodoData: Todo): Todo {
     let todo = new Todo();
     // const { name, description} = newTodoData;
     todo.id = uuidv4();
@@ -24,8 +27,8 @@ export class TodoController {
     this.todos.push(todo);
     return todo;
   }
-  @Post()
-  addTodo(@Body() newTodoData: Partial<TodoEntity>): Promise<TodoEntity> {
-    return this.todoService.addTodo(newTodoData);
+  @Get('version')
+  version() {
+    return '1';
   }
 }
