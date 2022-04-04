@@ -6,6 +6,7 @@ import { UpdateTodoDto } from './update-todo.dto';
 import { DeleteResult } from 'typeorm/query-builder/result/DeleteResult';
 import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
 import { SearchTodoDto } from './dto/search-todo.dto';
+import { TodoStatusEnum } from './enums/todo-status.enum';
 
 @Injectable()
 export class TodoService {
@@ -54,6 +55,9 @@ export class TodoService {
 
   findAll(searchTodoDto: SearchTodoDto): Promise<TodoEntity[]> {
     const criterias = [];
+    const page = searchTodoDto.page || 1
+    const offset = searchTodoDto.offset || 10
+
     if (searchTodoDto.status) {
       criterias.push({ status: searchTodoDto.status });
     }
@@ -62,8 +66,13 @@ export class TodoService {
       criterias.push({ description: Like(`%${searchTodoDto.criteria}%`) });
     }
     if (criterias.length) {
-      return this.todoRepository.find({ withDeleted: true, where: criterias });
+      return this.todoRepository.find({ withDeleted: true, where: criterias ,
+         take : page , skip: offset});
     }
     return this.todoRepository.find({ withDeleted: true});
   }
+
+  // findByStatus(status :TodoStatusEnum ) {
+  //   return this.
+  // }
 }

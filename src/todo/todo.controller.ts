@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { Todo } from './Model/todo.model';
-import { Request } from 'express';
+import { query, Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { TodoService } from './todo.service';
 import { TodoEntity } from './Entity/todo.entity';
@@ -18,6 +18,25 @@ export class TodoController {
     // console.log(request);
     return this.todos;
   }
+
+
+  @Get()
+  getbyName(@Req() request: Request, @Query() query ): Todo[] {
+    const {name, statut} = query
+    
+ if (!name) {
+
+ }
+ if (!statut) {
+
+ }
+ 
+
+    // console.log(request);
+    return this.todos;
+  }
+
+
   @Post('fake')
   addTodo(@Body() newTodoData: Todo): Todo {
     let todo = new Todo();

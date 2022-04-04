@@ -4,9 +4,10 @@ import { PremierModule } from './premier/premier.module';
 import { TodoModule } from './todo/todo.module';
 import { ConfigModule } from '@nestjs/config';
 import { devConfig } from './config/dev.config';
-import { prodConfig } from "./config/prod.config";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { TodoEntity } from "./todo/Entity/todo.entity";
+import { prodConfig } from './config/prod.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TodoEntity } from './todo/Entity/todo.entity';
+import { Todo } from './todo/Model/todo.model';
 
 @Module({
   imports: [

@@ -9,6 +9,7 @@ export class AppController {
       to: 'GL3',
     };
   }
+  
   @Get('test')
   testGet(): string {
     return 'TEST OK';
