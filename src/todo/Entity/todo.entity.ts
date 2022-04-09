@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { TodoStatusEnum } from '../enums/todo-status.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { TiemstampEntity } from '../../generics/tiemstamp.entity';

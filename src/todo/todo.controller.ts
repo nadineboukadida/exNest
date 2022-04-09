@@ -1,53 +1,47 @@
-import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
-import { Todo } from './Model/todo.model';
-import { query, Request } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+/* eslint-disable prettier/prettier */
+import { Body, Controller, Get, Post, Patch, Delete, Param, Query} from '@nestjs/common';
 import { TodoService } from './todo.service';
-import { TodoEntity } from './Entity/todo.entity';
-@Controller({
-  path: 'todo',
-  version: '1',
-})
+import { SearchTodoDto } from './dto/search-todo.dto'
+import { StatsTodoDto } from './dto/stats-todo.dto'
+import { AddTodoDto } from './dto/add-todo.dto'
+import { TodoEntity } from './Entity/todo.entity'
+import { UpdateTodoDto } from './update-todo.dto'
+import { DeleteResult } from 'typeorm/query-builder/result/DeleteResult'
+import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult'
+
+@Controller('todo')
 export class TodoController {
-  constructor(private todoService: TodoService) {
-    this.todos = [new Todo('1', 'Sport', 'Faire du sport')];
-  }
-  todos: Todo[] = [];
-  @Get()
-  getTodos(@Req() request: Request): Todo[] {
-    // console.log(request);
-    return this.todos;
-  }
-
+  constructor(private todoService: TodoService) {}
 
   @Get()
-  getbyName(@Req() request: Request, @Query() query ): Todo[] {
-    const {name, statut} = query
-    
- if (!name) {
+  getTodos(@Query() searchTodo: SearchTodoDto): Promise<TodoEntity[]> {
+    return this.todoService.findAll(searchTodo);
+  }
+  
+  @Get("/stats")
+  getTodoStats(@Query() statsTodo: StatsTodoDto): Promise<any> {
+    return this.todoService.getTodoStats(statsTodo)
+  }
 
- }
- if (!statut) {
+  @Get("/:id")
+  getTodoById(@Param('id') id: string): Promise<TodoEntity> {
+    return this.todoService.findOneById(id);
+  }
 
- }
+
+  @Post()
+  addTodo(@Body() todo: AddTodoDto): Promise<TodoEntity> {
+    return this.todoService.addTodo(todo);
+  }
+
+  @Patch('/:id')
+  updateTodo(@Param('id') id: string, @Body() newTodo: UpdateTodoDto): Promise<TodoEntity> {
+    return this.todoService.updateTodo(newTodo, id);
+  }
+
+  @Delete('/:id')
+  DeleteTodo(@Param('id') id: string): Promise<DeleteResult> {
+    return this.todoService.deleteTodo(id);
+  }
  
-
-    // console.log(request);
-    return this.todos;
-  }
-
-
-  @Post('fake')
-  addTodo(@Body() newTodoData: Todo): Todo {
-    let todo = new Todo();
-    // const { name, description} = newTodoData;
-    todo.id = uuidv4();
-    todo = { ...todo, ...newTodoData };
-    this.todos.push(todo);
-    return todo;
-  }
-  @Get('version')
-  version() {
-    return '1';
-  }
 }

@@ -1,8 +1,9 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { TodoController } from './todo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodoEntity } from './Entity/todo.entity';
-import { TodoService } from './todo.service';
+import { TodoService } from './todo.service'
 import { TodoDBController } from './todoDB.controller';
 
 @Module({

@@ -1,5 +1,5 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { PremierModule } from './premier/premier.module';
 import { TodoModule } from './todo/todo.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +8,7 @@ import { prodConfig } from './config/prod.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodoEntity } from './todo/Entity/todo.entity';
 import { Todo } from './todo/Model/todo.model';
+import { UserCvModule } from './user-cv/user-cv.module';
 
 @Module({
   imports: [
@@ -28,8 +29,9 @@ import { Todo } from './todo/Model/todo.model';
       synchronize: true,
       debug: true,
     }),
+    UserCvModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}

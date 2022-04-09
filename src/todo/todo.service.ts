@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Like, Repository } from "typeorm";
-import { TodoEntity } from './Entity/todo.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UpdateTodoDto } from './update-todo.dto';
-import { DeleteResult } from 'typeorm/query-builder/result/DeleteResult';
-import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
-import { SearchTodoDto } from './dto/search-todo.dto';
-import { TodoStatusEnum } from './enums/todo-status.enum';
+/* eslint-disable prettier/prettier */
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { Like, Repository } from 'typeorm'
+import { TodoEntity } from './Entity/todo.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { UpdateTodoDto } from './update-todo.dto'
+import { DeleteResult } from 'typeorm/query-builder/result/DeleteResult'
+import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult'
+import { SearchTodoDto } from './dto/search-todo.dto'
+import { StatsTodoDto } from './dto/stats-todo.dto'
 
 @Injectable()
 export class TodoService {
@@ -14,8 +15,9 @@ export class TodoService {
     @InjectRepository(TodoEntity)
     private todoRepository: Repository<TodoEntity>,
   ) {}
-  addTodo(todo: Partial<TodoEntity>): Promise<TodoEntity> {
-    return this.todoRepository.save(todo);
+
+  async addTodo(todo: Partial<TodoEntity>): Promise<TodoEntity> {
+    return await this.todoRepository.save(todo);
   }
 
   async updateTodo(
@@ -37,6 +39,7 @@ export class TodoService {
     }
     throw new NotFoundException(`Le todo d'id ${id} n'existe pas `);
   }
+
   async softDeleteTodo(id: string): Promise<UpdateResult> {
     const result = await this.todoRepository.softDelete(id);
     if (result.affected) {
@@ -53,10 +56,11 @@ export class TodoService {
     throw new NotFoundException(`Le todo d'id ${id} n'existe pas `);
   }
 
-  findAll(searchTodoDto: SearchTodoDto): Promise<TodoEntity[]> {
+  async findAll(searchTodoDto: SearchTodoDto): Promise<TodoEntity[]> {
     const criterias = [];
-    const page = searchTodoDto.page || 1
-    const offset = searchTodoDto.offset || 10
+    const page = searchTodoDto.page || 1;
+    const offset = searchTodoDto.offset || 5;
+    const skip = (page -1) * offset;
 
     if (searchTodoDto.status) {
       criterias.push({ status: searchTodoDto.status });
@@ -65,14 +69,35 @@ export class TodoService {
       criterias.push({ name: Like(`%${searchTodoDto.criteria}%`) });
       criterias.push({ description: Like(`%${searchTodoDto.criteria}%`) });
     }
-    if (criterias.length) {
-      return this.todoRepository.find({ withDeleted: true, where: criterias ,
-         take : page , skip: offset});
-    }
-    return this.todoRepository.find({ withDeleted: true});
+    
+      return await this.todoRepository.find({
+        withDeleted: true,
+        ...(criterias.length ? {where: criterias} : {} ),
+        take: offset,
+        skip: skip,
+      });
   }
 
-  // findByStatus(status :TodoStatusEnum ) {
-  //   return this.
-  // }
+  async findOneById(id: string): Promise<TodoEntity> {
+    const todo = await this.todoRepository.findOneBy({id});
+    if (todo)
+      return todo;
+    throw new NotFoundException(`Le todo d'id ${id} n'existe pas `)
+  }
+  
+  async getTodoStats(statsTodo: StatsTodoDto): Promise<any> {
+    const from = statsTodo.from || "1970-01-01"
+    const to = statsTodo.to || "2500-12-31"
+
+    const queryBuilder = this.todoRepository.createQueryBuilder('todo');
+    return await queryBuilder
+      .select("todo.status")
+      .addSelect("count(*)", "todos")
+      .where("todo.createdAt Between :from AND :to")
+      .setParameter('from', from)
+      .setParameter('to', to)
+      .groupBy('todo.status')
+      .getRawMany();
+  }
+  
 }
